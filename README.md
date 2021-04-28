@@ -37,7 +37,7 @@ At some point in time, this output table is closed, no further data is added to 
 The data is now transferred into lots of smaller files (RRDs - round robin databases) which contain only the data for a specific small set of data sources.
 Those files are the final storage for your metrics.
 
-Now when you request a graph to be plotted, cacti calls "rrdtool" to read the RRD files and plot the graph.
+Now when you request a graph to be plotted, cacti does a bit of DB-magic to gather all the bits and pieces that are needed to create your desired diageram and then it calls "rrdtool" to read the RRD files and plot the graph.
 
 
 ## The hardware 
@@ -115,11 +115,63 @@ I am talking just from our experiences here, and there might be many more things
 We went thru a whole series of troubleshooting until I came up with the current settings, and they are probably still not optimal.
 But I learned a few hints that help tuning those parameters.
 
+#### How much RAM is my DB using?
+This mainly depends on some static parameters as well as some that are influenced by the number of connections to the DB.
+Here is a good resource to do a quick check, how much your DB will need: https://www.mysqlcalculator.com/
+
+Static parameters:
+ * key_buffer_size
+ * query_cache_size
+ * tmp_table_size
+ * innodb_buffer_pool_size
+ * innodb_additional_mem_pool_size
+ * innodb_log_buffer_size	
+
+Connection based parameters (multiply by max_connections):
+  * sort_buffer_size
+  * read_buffer_size
+  * read_rnd_buffer_size
+  * join_buffer_size
+  * thread_stack
+  * binlog_cache_size
+
+
 #### InnoDB buffers
+innodb_buffer_pool =	20G ... sky is the limit
+
 This is probably one of the parameters with the most impact.
 It tells your DB, how much RAM it can use to cache all the data that it keeps.
+The more space you offer to the DB, the more data can be kept in memory, which means significantly faster data-processing.
 General advice is to try and keep the whole DB content in the RAM, as this significantly reduces disk accesses which are much slower than RAM accesses.
 In larger setups, this can mean 20..30..40GB of buffer space to begin with.
+
+Monitoring hints:
+  * Check the buffer-usage by looking at the free buffer pages, try to keep at least around 10-20% of free pages
+
+#### Heap size and temp tables
+max_heap_table_size = 4G ... 6G
+
+This is the space limit for the creation of in-memory tables.
+Cacti's boost-mechanism uses a memory-based table, which can benefit largel from this parameter.
+Increasing the space would help to keep more elements in the table during re-sync, which can increase the processing speed from memory to disk.
+
+max_tmp_tables = 64
+
+Increasing this value allows the DB to create more temporary tables.
+Those are used for caching the results when queries contain sub-select statements within other statements.
+
+#### per-connection values
+We are talking now about “per-connection” values, which means with many connections the RAM would be exhausted pretty fast.
+
+##### join buffer
+join_buffer_size = 128k ... 256k
+
+This is used to cache results when a join is used in an SQL query.
+Be careful with this setting, as tempting as it can be to try and increase it to speed up joins.
+With many connections (specially in the main DB) you can easily run into a congestion situation.
+Decreasing this can actually help improving performance!
+
+##### 
 
 #### Databases in NUNMA setups
 When you are using a multi-CPU based system, the RAM is not shared between those CPUs as you might think.
