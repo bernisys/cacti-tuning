@@ -111,13 +111,17 @@ Hint: You can add CPU cores and RAM on the fly if your VM is configured for memo
 This is likely to be the most difficult chapter in the whole documentation.
 There are so many little parameters which can greatly affect your DB performance, and it depends on each setup, which of those parameters need tuning and which can be left well alone.
 
+Luckily the remote pollers are much easier to handle, once you found a good balance on your main poller.
+They are usually much less loaded than the central DB and therefore more forgiving if you miscalculated or mis-estimated a parameter.
+
 I am talking just from our experiences here, and there might be many more things which we did not consider.
-We went thru a whole series of troubleshooting until I came up with the current settings, and they are probably still not optimal.
-But I learned a few hints that help tuning those parameters.
+We went thru a whole series of troubleshooting until I was able to understand the whole setup properly in enough detail to come up with the current settings.
+They are probably still not optimal, but I learned a lot about the internal workings of MySQL and collected also a few hints that help tuning those parameters.
 
 ### How much RAM is my DB using?
-This mainly depends on some static parameters as well as some that are influenced by the number of connections to the DB.
-Here is a good resource to do a quick check, how much your DB will need: https://www.mysqlcalculator.com/
+This is usually the first question that comes into the mind of a server operator, as RAM implies a significant amount of costs.
+THe answer mainly depends on some static parameters as well as some that are influenced by the number of connections to the DB.
+Here is a good resource to do a quick check, how much your DB will need based on your tuning considerations: https://www.mysqlcalculator.com/
 
 Static parameters:
  * key_buffer_size
@@ -134,6 +138,8 @@ Connection based parameters (multiply by max_connections):
   * join_buffer_size
   * thread_stack
   * binlog_cache_size
+
+Total usage is roughly the sum of all static parameters plus the number of connections times the sum of all connection based parameters.
 
 
 ### InnoDB buffers
