@@ -107,7 +107,21 @@ Some notes that might help with your decisions:
 
 Hint: You can add CPU cores and RAM on the fly if your VM is configured for memory hot-add!
 
-### Databases in NUNMA setups
+### The Database
+This is likely to be the most difficult chapter in the whole documentation.
+There are so many little parameters which can greatly affect your DB performance, and it depends on each setup, which of those parameters need tuning and which can be left well alone.
+
+I am talking just from our experiences here, and there might be many more things which we did not consider.
+We went thru a whole series of troubleshooting until I came up with the current settings, and they are probably still not optimal.
+But I learned a few hints that help tuning those parameters.
+
+#### InnoDB buffers
+This is probably one of the parameters with the most impact.
+It tells your DB, how much RAM it can use to cache all the data that it keeps.
+General advice is to try and keep the whole DB content in the RAM, as this significantly reduces disk accesses which are much slower than RAM accesses.
+In larger setups, this can mean 20..30..40GB of buffer space to begin with.
+
+#### Databases in NUNMA setups
 When you are using a multi-CPU based system, the RAM is not shared between those CPUs as you might think.
 Each physical bar of RAM is merely assigned to one physical CPU.
 If the other CPU requests some content on a RAM section which the other CPU owns, it needs to be fetched by that CPU and copied over to the other one.
