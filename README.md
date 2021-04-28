@@ -107,7 +107,7 @@ Some notes that might help with your decisions:
 
 Hint: You can add CPU cores and RAM on the fly if your VM is configured for memory hot-add!
 
-### The Database
+## The Database
 This is likely to be the most difficult chapter in the whole documentation.
 There are so many little parameters which can greatly affect your DB performance, and it depends on each setup, which of those parameters need tuning and which can be left well alone.
 
@@ -115,7 +115,7 @@ I am talking just from our experiences here, and there might be many more things
 We went thru a whole series of troubleshooting until I came up with the current settings, and they are probably still not optimal.
 But I learned a few hints that help tuning those parameters.
 
-#### How much RAM is my DB using?
+### How much RAM is my DB using?
 This mainly depends on some static parameters as well as some that are influenced by the number of connections to the DB.
 Here is a good resource to do a quick check, how much your DB will need: https://www.mysqlcalculator.com/
 
@@ -136,7 +136,7 @@ Connection based parameters (multiply by max_connections):
   * binlog_cache_size
 
 
-#### InnoDB buffers
+### InnoDB buffers
 ```innodb_buffer_pool =	20G ... sky is the limit```
 
 This is probably one of the parameters with the most impact.
@@ -148,7 +148,7 @@ In larger setups, this can mean 20..30..40GB of buffer space to begin with.
 Monitoring hints:
   * Check the buffer-usage by looking at the free buffer pages, try to keep at least around 10-20% of free pages
 
-#### Heap size and temp tables
+### Heap size and temp tables
 ```max_heap_table_size = 4G ... 6G```
 
 This is the space limit for the creation of in-memory tables.
@@ -160,7 +160,7 @@ Increasing the space would help to keep more elements in the table during re-syn
 Increasing this value allows the DB to create more temporary tables.
 Those are used for caching the results when queries contain sub-select statements within other statements.
 
-#### join buffer
+### join buffer
 ```join_buffer_size = 128k ... 256k```
 
 This is used to cache results when a join is used in an SQL query.
@@ -169,7 +169,7 @@ We are talking about a “per-connection” value, which means with many connect
 With many connections (specially in the main DB) you can easily run into a congestion situation.
 Decreasing this can actually help improving performance in setups with many parallel connections!
 
-#### query cache
+### query cache
 ```query_cache_size = 64M ... 256M```
 
 The query cache is discussed on many webpages, and most of them come to the same conclusion:
@@ -179,7 +179,7 @@ If you choose it too high, then the overhead for managing the cached items will 
 Unfortunately, this is a trial-and-error setting, as every setup is completely different and the effects of the cache are also unpredictable.
 As a result, nobody can give any real life experiences that would match other situations (and specifically yours).
  
-#### SSD considerations
+### SSD considerations
 ```
 innodb_write_io_threads 	= 16 ... 64
 innodb_read_io_threads = 16 ..64
@@ -196,7 +196,7 @@ If you use a newer version of Mysql, there is a last value which you can tune:
 
 General rule of thumb seems to be 2x capacity or 2000, which ever is higher.
 
-#### Network related parameters
+### Network related parameters
 ```wait_timeout =	600```
 
 If connections are unused, the SQL server waits by default a too long time until they are closed.
@@ -236,7 +236,7 @@ This name is a bit misleading, it is actually the maximum allowed size of an ass
 The value should be kept high enough to allow faster processing of SQL data that is sent from the remote pollers to the central server (Poller recovery, boost, data transfer during poll-cycles)
 
 
-#### TODO: some values from our old environment
+### TODO: some values from our old environment
 These need to be reviewed and checked.
 ```
 key_buffer_size = 3G
@@ -256,7 +256,7 @@ sql_mode =	NO_ENGINE_SUBSTITUTION, NO_AUTO_CREATE_USER   [, NO_ZERO_IN_DATE, ERR
 ```
 
 
-#### Databases in NUNMA setups
+### Databases in NUNMA setups
 When you are using a multi-CPU based system, the RAM is not shared between those CPUs as you might think.
 Each physical bar of RAM is merely assigned to one physical CPU.
 If the other CPU requests some content on a RAM section which the other CPU owns, it needs to be fetched by that CPU and copied over to the other one.
