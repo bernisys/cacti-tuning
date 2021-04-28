@@ -137,7 +137,7 @@ Connection based parameters (multiply by max_connections):
 
 
 #### InnoDB buffers
-innodb_buffer_pool =	20G ... sky is the limit
+```innodb_buffer_pool =	20G ... sky is the limit```
 
 This is probably one of the parameters with the most impact.
 It tells your DB, how much RAM it can use to cache all the data that it keeps.
@@ -149,13 +149,13 @@ Monitoring hints:
   * Check the buffer-usage by looking at the free buffer pages, try to keep at least around 10-20% of free pages
 
 #### Heap size and temp tables
-max_heap_table_size = 4G ... 6G
+```max_heap_table_size = 4G ... 6G```
 
 This is the space limit for the creation of in-memory tables.
 Cacti's boost-mechanism uses a memory-based table, which can benefit largel from this parameter.
 Increasing the space would help to keep more elements in the table during re-sync, which can increase the processing speed from memory to disk.
 
-max_tmp_tables = 64
+```max_tmp_tables = 64```
 
 Increasing this value allows the DB to create more temporary tables.
 Those are used for caching the results when queries contain sub-select statements within other statements.
@@ -164,14 +164,99 @@ Those are used for caching the results when queries contain sub-select statement
 We are talking now about “per-connection” values, which means with many connections the RAM would be exhausted pretty fast.
 
 ##### join buffer
-join_buffer_size = 128k ... 256k
+```join_buffer_size = 128k ... 256k```
 
 This is used to cache results when a join is used in an SQL query.
 Be careful with this setting, as tempting as it can be to try and increase it to speed up joins.
 With many connections (specially in the main DB) you can easily run into a congestion situation.
 Decreasing this can actually help improving performance!
 
-##### 
+#### query cache
+```query_cache_size = 64M ... 256M```
+
+The query cache is discussed on many webpages, and most of them come to the same conclusion:
+
+Yes, it will help to speed up your queries, if you choose the right value - but this is something you need to do yourself, as every DB is different.
+If you choose it too high, then the overhead for managing the cached items will be higher than actually repeating a query on the DB from scratch.
+Unfortunately, this is a trial-and-error setting, as every setup is completely different and the effects of the cache are also unpredictable.
+As a result, nobody can give any real life experiences that would match other situations (and specifically yours).
+ 
+#### SSD considerations
+```
+innodb_write_io_threads 	= 16 ... 64
+innodb_read_io_threads = 16 ..64
+innodb_io_capacity = 10000
+```
+
+If you followed my suggestions on storage, the you are most likely th on a local SSD or SSD-backed storage array.
+Since those provides much higher IOPS performance, you can increase the number of parallel read and write threads from the default to a much higher value.
+Same goes also for the actual number of disk-operations per second.
+
+If you use a newer version of Mysql, there is a last value which you can tune:
+
+```innodb_io_capacity_max =	20000```
+
+General rule of thumb seems to be 2x capacity or 2000, which ever is higher.
+
+#### Network related parameters
+```wait_timeout =	600```
+
+If connections are unused, the SQL server waits by default a too long time until they are closed.
+This can keep a lot of RAM allocated but not used, therefore you should decrease this parameter to a reasonable value.
+Since Cacti poll cycles are usually up to 5 minutes long, it should be sufficient to keep the connection open for max 2 poll cycles or 10 minutes.
+
+```net_read_timeout = 60```
+
+The server waits this long for more data on the current connection before closing it.
+Increasing this value might help to lower the DB-Load because on the same connection, several queries might be still in the caches and can be re-used.
+
+```open_files_limit = 65535```
+
+You need to increase this value before you can actually increase the max_connections value below.
+
+**Attention! This value is connected with the max open files in the OS!**
+(implemented via SystemD setting, as this needs a modification in the ulimit settings)
+
+```max_connections = 8000```
+
+This is important to balance according to your maximum parallel connections.
+If you set this value too low, pollers can be locked out of the DB if they open more connections than the server offers.
+
+**Attention! This value is connected with the open_files_limit parameter!**
+
+We increased the max_connections in the past to 10000 to prevent locking the remote pollers out from the main DB due to too many parallel connections.
+This can happen when the connection breaks and a new connection is opened by the poller before the old one is closed.
+Our long-term statistics show, that this value is reached only in rare conditions, so I decreased the value again to create a bit more headroom in the RAM for more important data.
+Probably we can lower the value even more, as 4000 is the current absolute maximum seen in our connections diagram - and even this was only due to a fault-situation.
+
+Monitoring hint:
+ * check the maximum parallel connections value - it is an all-time high that can be reset if needed (flush-status)
+
+```max_allowed_packet =	32M```
+
+This name is a bit misleading, it is actually the maximum allowed size of an assembled (from many network packets) SQL query that the server can store in its receive buffer.
+The value should be kept high enough to allow faster processing of SQL data that is sent from the remote pollers to the central server (Poller recovery, boost, data transfer during poll-cycles)
+
+
+#### TODO: some values from our old environment
+These need to be reviewed and checked.
+```
+key_buffer_size = 3G
+sort_buffer_size = 256M
+read_buffer_size = 8M
+read_rnd_buffer_size = 8M
+innodb_log_file_size = 256M
+innodb_flush_log_at_trx_commit =	2
+innodb_flush_method = O_DIRECT
+tmp_table_size =	256M
+thread_cache_size = 256 ? 	[-1 = auto]
+query_cache_limit =	512M
+table_definition_cache = 4096
+table_open_cache = 5120
+symbolic-links = 0
+sql_mode =	NO_ENGINE_SUBSTITUTION, NO_AUTO_CREATE_USER   [, NO_ZERO_IN_DATE, ERROR_FOR_DIVISION_BY_ZERO]
+```
+
 
 #### Databases in NUNMA setups
 When you are using a multi-CPU based system, the RAM is not shared between those CPUs as you might think.
