@@ -97,7 +97,15 @@ Usually these machines can be much smaller, specially if you go for a higher amo
 You can for example provision them across your different data centers or place a poller into a specific part of your network, that's completely up to your needs and imagination.
 You should try to divide the load halfway equally across the pollers, so that each of them sees about the same amount of devices or data sources.
 
- * You can use 
+Some notes that might help with your decisions:
+ * You can use VMs here, as they only see a small share of the load that the main server will see.
+ * CPU/Core count is Depending on the device count that is monitored with that poller.
+   If you're flexible enough and can change this setting at any time, start with 2-4 cores.
+ * The amount of RAM depends also strongly on the number of devices.
+   If you are flexible, start with 8GB, see how it fits your need
+ * Storage performance is not that important on a remote poller, as long as the whole poller DB fits into the RAM.
+
+Hint: You can add CPU cores and RAM on the fly if your VM is configured for memory hot-add!
 
 ### Databases in NUNMA setups
 When you are using a multi-CPU based system, the RAM is not shared between those CPUs as you might think.
