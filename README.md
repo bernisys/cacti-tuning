@@ -160,16 +160,14 @@ Increasing the space would help to keep more elements in the table during re-syn
 Increasing this value allows the DB to create more temporary tables.
 Those are used for caching the results when queries contain sub-select statements within other statements.
 
-#### per-connection values
-We are talking now about “per-connection” values, which means with many connections the RAM would be exhausted pretty fast.
-
-##### join buffer
+#### join buffer
 ```join_buffer_size = 128k ... 256k```
 
 This is used to cache results when a join is used in an SQL query.
 Be careful with this setting, as tempting as it can be to try and increase it to speed up joins.
+We are talking about a “per-connection” value, which means with many connections the RAM would be exhausted pretty fast!
 With many connections (specially in the main DB) you can easily run into a congestion situation.
-Decreasing this can actually help improving performance!
+Decreasing this can actually help improving performance in setups with many parallel connections!
 
 #### query cache
 ```query_cache_size = 64M ... 256M```
