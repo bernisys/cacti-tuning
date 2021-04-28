@@ -12,7 +12,7 @@ This is the setup used in a datacenter of a company i am working for (in 2021-04
 
 The following chapters describe the components and their performance considerarions.
 
- * [The Basics ](Basics.md) describing a few things inside cacti, to understand the tuning considerations.
- * [The Hardware](Hardware.md)
- * [The Database](The Database.md)
+ * [The Basics ](Basics.md) is describing a few things inside cacti, to understand the tuning considerations.
+ * [The Hardware](Hardware.md) gives you some ideas to plan your hardware setup.
+ * [The Database](Database.md) shall provide an overview about the database tuning.
 
