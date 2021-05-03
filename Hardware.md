@@ -1,4 +1,4 @@
-# The hardware 
+# Hhardware considerations
 Coming now to the first important thing that you should consider:
 
 What kind of hardware should i use?
