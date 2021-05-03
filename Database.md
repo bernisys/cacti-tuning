@@ -1,4 +1,4 @@
-# The Database
+# Database Optimizations
 This is likely to be the most difficult chapter in the whole documentation.
 There are so many little parameters which can greatly affect your DB performance, and it depends on each setup, which of those parameters need tuning and which can be left well alone.
 
