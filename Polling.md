@@ -71,3 +71,5 @@ Also tuning the threads/processes settings can be a good idea but specially with
 When it comes to parallel polling from several machines, the final solution can be to shift the poller time, actually starting the pollers at slightly different points in time.
 Start with the poller which has the most devices and losts of relatively fast SNMP based metrics and just delay the poller start by 10-20 seconds just by adding a sleep to the cron job.
 If this helps, it might be worth considering to write a wrapper script which you can configure easily per poller.
+This can help relaxing the in-rush of data to the main database a bit, hence distributing the core load across a wider time span.
+As a final solution it makes sense to start the smaller pollers later than the most loaded ones, because the smaller ones finish in less time, so you can delay them without having to worry too much about the poller cycle time of the whole setup.
