@@ -22,7 +22,7 @@ There are probably setups where a VM is keeping up fine with the load, specially
 While a VM can be pretty helpful when it comes to software upgrades (snapshots), it has a few drawbacks, which all have to do with the VM usually not being the only one in the cluster. And when ever the cluster load is high, it is likely affecting your VM in many ways.
 
 Here's a short overview about things that are not beneficial in a virtualized environment:
- * a VM usually shares CPUs with other VMs, and the more cores you assign the more impact you might feel
+ * a VM usually shares CPUs with other VMs, and the more cores you assign the more impact you might feel, as VMs with less cores are more likely to be scheduled again because a smaller numbers of cores are more likely to become available at the same time.
  * IF you really want to try with a VM, maybe for financial reasons (hey the cluster is already there), go with core-binding!
  * a VM shares its RAM with other VMs, and if there is a RAM congestion in the cluster, then you are likely to experienve surge of slowness in yout VM
  * a VM shares the storage with other VMs.
