@@ -14,6 +14,6 @@ The following chapters describe the components and their performance considerari
 
  * [The Basics ](Basics.md) is describing a few things inside cacti, to understand the tuning considerations.
  * [Hardware considerations](Hardware.md) gives you some ideas to plan your hardware setup.
- * [Database Optmiizations](Database.md) shall provide an overview about the database tuning.
+ * [Database Optimizations](Database.md) shall provide an overview about the database tuning.
  * [Polling Optimizations](Polling.md) provides ideas about how to solve specivic problems that are related to high polling time issues.
 
