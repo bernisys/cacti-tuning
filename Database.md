@@ -118,10 +118,20 @@ You need to increase this value before you can actually increase the max_connect
 **Attention! This value is connected with the max open files in the OS!**
 (implemented via SystemD setting, as this needs a modification in the ulimit settings)
 
-```max_connections = 8000```
+```max_connections = 8000``` (for main poller)
+```max_connections = 1000``` (for remote systems)
 
 This is important to balance according to your maximum parallel connections.
-If you set this value too low, pollers can be locked out of the DB if they open more connections than the server offers.
+Depending on the number of logins and use of spine data collector processes and threads setting, MariaDB will need to handle a lot of  parallel connections.
+The rough calculation for spine is:
+```total_connections = total_processes * (total_threads + script_servers + 1)```
+Also you should add a few connections to leave headroom for user connections, which will change depending on the number of concurrent login accounts. 
+
+If you set this value too low, pollers can be permanently locked out of the DB by MySQL internal mechanisms, if they try to open more connections than the server offers.
+In this case you will see messages like this in the SQL logs:
+
+```Host 'IP' is blocked because of many connection errors; unblock with 'mysqladmin flush-hosts'```
+
 
 **Attention! This value is connected with the open_files_limit parameter!**
 
