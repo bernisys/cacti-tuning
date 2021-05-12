@@ -117,7 +117,7 @@ You need to increase this value before you can actually increase the max_connect
 
 **Attention! This value is connected with the max open files in the OS!**
 (implemented via SystemD setting, as this needs a modification in the ulimit settings)
-
+ 
 ```max_connections = 8000``` (for main poller)  
 ```max_connections = 1000``` (for remote systems)
 
